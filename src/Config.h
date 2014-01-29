@@ -57,8 +57,8 @@ class Config {
         Config* clone();
 
 		// get/set for bgs
-		bool get_bg(const Glib::ustring disp, Glib::ustring &file, SetBG::SetMode &mode, Gdk::Color &bgcolor);
-		bool set_bg(const Glib::ustring disp, const Glib::ustring file, const SetBG::SetMode mode, Gdk::Color bgcolor);
+        bool get_bg(const Glib::ustring disp, Glib::ustring &file, SetBG::SetMode &mode, Gdk::Color &bgcolor, bool &flip);
+        bool set_bg(const Glib::ustring disp, const Glib::ustring file, const SetBG::SetMode mode, Gdk::Color bgcolor, bool flip);
 
 		// get all groups (bg_saved.cfg)
 		bool get_bg_groups(std::vector<Glib::ustring> &groups);

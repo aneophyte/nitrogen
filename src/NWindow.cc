@@ -43,16 +43,20 @@ NWindow::NWindow(SetBG* bg_setter) : apply (Gtk::Stock::APPLY), btn_prefs(Gtk::S
 	main_vbox.set_spacing (5);
 	add (main_vbox);
 
+    //setup flip checkbox
+    chk_btn_flip.set_label("Flip");
+
 	// setup imagecombos
 	this->setup_select_boxes();
 
 	// bottom hbox
-	bot_hbox.set_spacing (5);
+    bot_hbox.set_spacing (6);
 	bot_hbox.pack_start (select_mode, FALSE, FALSE, 0);
 	bot_hbox.pack_start (select_display, FALSE, FALSE, 0);
 	bot_hbox.pack_start(button_bgcolor, FALSE, FALSE, 0);
 	
-	bot_hbox.pack_end(apply, FALSE, FALSE, 0);
+    bot_hbox.pack_end(chk_btn_flip, FALSE, FALSE, 0);
+    bot_hbox.pack_end(apply, FALSE, FALSE, 0);
 	bot_hbox.pack_end(btn_prefs, FALSE, FALSE, 0);
 
 	// add to main box
@@ -120,7 +124,8 @@ void NWindow::show (void) {
     apply.show();
     bot_hbox.show();
     main_vbox.show();
-    button_bgcolor.show();
+    chk_btn_flip.show();
+    button_bgcolor.show();    
     btn_prefs.show();
 
     this->set_title("Nitrogen");
@@ -141,7 +146,7 @@ void NWindow::sighandle_dblclick_item (const Gtk::TreeModel::Path& path) {
 	// find out which image was double clicked
 	Gtk::TreeModel::iterator iter = (view.store)->get_iter(path);
 	Gtk::TreeModel::Row row = *iter;
-	this->set_bg(row[view.record.Filename]);
+    this->set_bg(row[view.record.Filename]);
 
     // preview - set dirty flag
     m_dirty = true;
@@ -166,9 +171,9 @@ void NWindow::sighandle_click_apply (void) {
     SetBG::SetMode mode = SetBG::string_to_mode( this->select_mode.get_active_data() );
 	Glib::ustring thedisp = this->select_display.get_active_data(); 
 	Gdk::Color bgcolor = this->button_bgcolor.get_color();
-
+    bool flip = this->chk_btn_flip.get_active();
 	// save	
-    Config::get_instance()->set_bg(thedisp, file, mode, bgcolor);
+    Config::get_instance()->set_bg(thedisp, file, mode, bgcolor, flip);
 
     // tell the row that he's now on thedisp
     row[view.record.CurBGOnDisp] = thedisp;
@@ -235,9 +240,16 @@ void NWindow::set_bg(const Glib::ustring file) {
 	SetBG::SetMode mode   = SetBG::string_to_mode(this->select_mode.get_active_data());
 	Glib::ustring thedisp = this->select_display.get_active_data();
 	Gdk::Color bgcolor    = this->button_bgcolor.get_color();
+    bool flip = this->chk_btn_flip.get_active();
+
+    if(flip) {
+        g_debug("Is to be flipped.");
+    } else {
+        g_debug("Not to be flipped.");
+    }
 
 	// set it
-    bg_setter->set_bg(thedisp, file, mode, bgcolor);
+    bg_setter->set_bg(thedisp, file, mode, bgcolor, flip);
 }
 
 // leethax destructor
@@ -328,6 +340,7 @@ void NWindow::set_default_selections()
         Gdk::Color c;
         Glib::ustring default_selection;
         Glib::ustring file;
+        bool f;
 
         if (find(cfg_displays.begin(), cfg_displays.end(), this->bg_setter->get_fullscreen_key()) != cfg_displays.end())
             default_selection = this->bg_setter->get_fullscreen_key();
@@ -348,7 +361,7 @@ void NWindow::set_default_selections()
         if (find(cfg_displays.begin(), cfg_displays.end(), default_selection) == cfg_displays.end())
             return;
 
-        if (!cfg->get_bg(default_selection, file, m, c)) {
+        if (!cfg->get_bg(default_selection, file, m, c, f)) {
             // failed. return?
             return;
         }

@@ -38,15 +38,15 @@ void restore_bgs(SetBG* bg_setter)
 	Util::program_log("leaving restore_bgs()");
 }
 
-void set_bg_once(SetBG* bg_setter, Glib::ustring file, int head, SetBG::SetMode mode, bool save, Gdk::Color col)
+void set_bg_once(SetBG* bg_setter, Glib::ustring file, int head, SetBG::SetMode mode, bool save, Gdk::Color col, bool flip)
 {
 	Util::program_log("entering set_bg_once()");
 	Glib::ustring disp;
 
     disp = bg_setter->make_display_key(head);
-    bg_setter->set_bg(disp, file, mode, col);
+    bg_setter->set_bg(disp, file, mode, col, flip);
 
-	if (save) Config::get_instance()->set_bg(disp, file, mode, col);
+    if (save) Config::get_instance()->set_bg(disp, file, mode, col, flip);
 	while (Gtk::Main::events_pending())
 		Gtk::Main::iteration();
 
@@ -149,6 +149,7 @@ int main (int argc, char ** argv) {
 
     // should we set on the command line?
     Gdk::Color color("#000000");
+
     if ( parser->has_argument("set-color") ) {
         Glib::ustring bgcolor_str = parser->get_value ("set-color");
         color.parse(bgcolor_str);
@@ -158,32 +159,32 @@ int main (int argc, char ** argv) {
         xin_head = parser->get_intvalue("head");
 
     if ( parser->has_argument("set-tiled") )	{
-        set_bg_once(setter, startdir, xin_head, SetBG::SET_TILE, parser->has_argument("save"), color);
+        set_bg_once(setter, startdir, xin_head, SetBG::SET_TILE, parser->has_argument("save"), color, parser->has_argument("flip"));
         return 0;
     }
 
     if ( parser->has_argument("set-scaled") )	{
-        set_bg_once(setter, startdir, xin_head, SetBG::SET_SCALE, parser->has_argument("save"), color);
+        set_bg_once(setter, startdir, xin_head, SetBG::SET_SCALE, parser->has_argument("save"), color, parser->has_argument("flip"));
         return 0;
     }
 
     if ( parser->has_argument("set-auto") )	{
-        set_bg_once(setter, startdir, xin_head, SetBG::SET_AUTO, parser->has_argument("save"), color);
+        set_bg_once(setter, startdir, xin_head, SetBG::SET_AUTO, parser->has_argument("save"), color, parser->has_argument("flip"));
         return 0;
     }
 
     if ( parser->has_argument("set-zoom") )	{
-        set_bg_once(setter, startdir, xin_head, SetBG::SET_ZOOM, parser->has_argument("save"), color);
+        set_bg_once(setter, startdir, xin_head, SetBG::SET_ZOOM, parser->has_argument("save"), color, parser->has_argument("flip"));
         return 0;
     }
 
     if ( parser->has_argument("set-zoom-fill") )	{
-        set_bg_once(setter, startdir, xin_head, SetBG::SET_ZOOM_FILL, parser->has_argument("save"), color);
+        set_bg_once(setter, startdir, xin_head, SetBG::SET_ZOOM_FILL, parser->has_argument("save"), color, parser->has_argument("flip"));
         return 0;
     }
 
     if ( parser->has_argument("set-centered") )	{
-        set_bg_once(setter, startdir, xin_head, SetBG::SET_CENTER, parser->has_argument("save"), color);
+        set_bg_once(setter, startdir, xin_head, SetBG::SET_CENTER, parser->has_argument("save"), color, parser->has_argument("flip"));
         return 0;
     }
 

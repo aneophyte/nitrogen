@@ -108,7 +108,9 @@ ArgParser* create_arg_parser() {
     parser->register_option("set-centered", _("Sets the background to the given file") + openp + _("centered") + closep);
     parser->register_option("set-zoom", _("Sets the background to the given file") + openp + _("zoom") + closep);
     parser->register_option("set-zoom-fill", _("Sets the background to the given file") + openp + _("zoom-fill") + closep);
+    parser->register_option("flip", _("Flips the background vertically"));
     parser->register_option("save", _("Saves the background permanently"));
+
 
     std::vector<std::string> vecsetopts;
     vecsetopts.push_back("set-scaled");

@@ -54,6 +54,7 @@ class NWindow : public Gtk::Window {
 
         ImageCombo select_mode, select_display;
 
+        Gtk::CheckButton chk_btn_flip;
         Gtk::Button apply;
         Gtk::Button btn_prefs;
         Gtk::ColorButton button_bgcolor;

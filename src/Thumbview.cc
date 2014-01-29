@@ -656,8 +656,9 @@ void Thumbview::load_map_setbgs()
         Glib::ustring file;
         SetBG::SetMode mode;
         Gdk::Color bgcolor;
+        bool flip;
 
-        ret = Config::get_instance()->get_bg(*i, file, mode, bgcolor);
+        ret = Config::get_instance()->get_bg(*i, file, mode, bgcolor, flip);
         if (!ret)
         {
             std::cerr << "(load_map_setbgs) Could not get background stored info for " << *i << "\n";

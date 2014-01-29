@@ -61,7 +61,8 @@ class SetBG {
 		virtual bool set_bg(Glib::ustring &disp,
                             Glib::ustring file,
                             SetMode mode,
-                            Gdk::Color bgcolor);
+                            Gdk::Color bgcolor,
+                            bool flip);
 
         virtual void restore_bgs();
 
@@ -134,7 +135,8 @@ class SetBGGnome : public SetBG {
 		virtual bool set_bg(Glib::ustring &disp,
                             Glib::ustring file,
                             SetMode mode,
-                            Gdk::Color bgcolor);
+                            Gdk::Color bgcolor,
+                            bool flip);
 
         virtual std::map<Glib::ustring, Glib::ustring> get_active_displays();
         virtual Glib::ustring get_fullscreen_key();

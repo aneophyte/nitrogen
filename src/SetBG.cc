@@ -466,6 +466,7 @@ void SetBG::restore_bgs()
 	Glib::ustring file, display;
 	SetBG::SetMode mode;
 	Gdk::Color bgcolor;
+    bool flip;
 
 	Config *cfg = Config::get_instance();
 
@@ -492,15 +493,20 @@ void SetBG::restore_bgs()
     if (i == filtered_list.end()) {
         for (i = filtered_list.begin(); i != filtered_list.end(); i++)
         {
-            if (cfg->get_bg(*i, file, mode, bgcolor)) {
-                this->set_bg((*i), file, mode, bgcolor);
+            if (cfg->get_bg(*i, file, mode, bgcolor, flip)) {
+                this->set_bg((*i), file, mode, bgcolor, flip);
+                if (flip) g_debug("FLIP IZZ TRUE!");
+                else g_debug("FLIP NAUGHT TRUE!");
+
             } else {
                 std::cerr << _("ERROR") << std::endl;
             }
         }
     } else {
-        if (cfg->get_bg(*i, file, mode, bgcolor)) {
-            this->set_bg((*i), file, mode, bgcolor);
+        if (cfg->get_bg(*i, file, mode, bgcolor, flip)) {
+            this->set_bg((*i), file, mode, bgcolor, flip);
+            if (flip) g_debug("FLIP IZZ TRUE!");
+            else g_debug("FLIP NAUGHT TRUE!");
         } else {
             std::cerr << _("ERROR") << std::endl;
         }
@@ -530,7 +536,7 @@ Glib::RefPtr<Gdk::Display> SetBG::get_display(Glib::ustring& disp)
  * @param	bgcolor	The background color for modes that do not cover entire portions
  * @return			If it went smoothly
  */
-bool SetBG::set_bg(Glib::ustring &disp, Glib::ustring file, SetMode mode, Gdk::Color bgcolor)
+bool SetBG::set_bg(Glib::ustring &disp, Glib::ustring file, SetMode mode, Gdk::Color bgcolor, bool flip)
 {
     gint winx,winy,winw,winh,wind;
 	gint tarx, tary, tarw, tarh;
@@ -579,6 +585,12 @@ bool SetBG::set_bg(Glib::ustring &disp, Glib::ustring file, SetMode mode, Gdk::C
     }
 
     outpixbuf = this->make_resized_pixbuf(pixbuf, mode, bgcolor, tarw, tarh);
+
+    // Flip image horizontally if set to
+    if (flip) {
+        outpixbuf = outpixbuf->flip(true);
+        g_debug("Flipping image.");
+    }
 
     // render it to the pixmap
 	pixmap->draw_pixbuf(gc_, outpixbuf, 0, 0, tarx, tary, tarw, tarh, Gdk::RGB_DITHER_NONE, 0, 0);
@@ -665,7 +677,7 @@ Glib::RefPtr<Gdk::Pixbuf> SetBG::make_resized_pixbuf(Glib::RefPtr<Gdk::Pixbuf> p
             std::cerr << _("Unknown mode for saved bg") << std::endl;
             // @TODO: raise exception
             //return false;
-    };
+    };    
 
     return outpixbuf;
 }
@@ -946,7 +958,7 @@ void SetBGXinerama::get_target_dimensions(Glib::ustring& disp, gint winx, gint w
  *
  * Simply calls gconftool-2 for now, until we find a better way to do it.
  */
-bool SetBGGnome::set_bg(Glib::ustring &disp, Glib::ustring file, SetMode mode, Gdk::Color bgcolor)
+bool SetBGGnome::set_bg(Glib::ustring &disp, Glib::ustring file, SetMode mode, Gdk::Color bgcolor, bool flip)
 {
     Glib::ustring strmode;
     switch(mode) {

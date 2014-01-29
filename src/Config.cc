@@ -84,9 +84,10 @@ Config* Config::clone()
  * @param	file	Returns the file thats in there
  * @param	mode	Returns the mode thats in there
  * @param	bgcolor	Returns the bg color thats in there, if any, or a default Gdk::Color if none
+ * @param   flip    Returns if the background is to be flipped
  * @return			If it could find the entry
  */
-bool Config::get_bg(const Glib::ustring disp, Glib::ustring &file, SetBG::SetMode &mode, Gdk::Color &bgcolor) {
+bool Config::get_bg(const Glib::ustring disp, Glib::ustring &file, SetBG::SetMode &mode, Gdk::Color &bgcolor, bool &flip) {
 
 	if ( ! Config::check_dir() ) {
 		std::cerr << _("Could not open config directory.") << std::endl;
@@ -133,7 +134,7 @@ bool Config::get_bg(const Glib::ustring disp, Glib::ustring &file, SetBG::SetMod
 		g_key_file_free(kf);
 		std::cerr << _("Could not get mode from config file.") << std::endl;
 		return false;
-	}
+    }
 
 	Glib::ustring tcol("#000000");
 	gchar *color = g_key_file_get_string(kf, disp.c_str(), "bgcolor", &ge);
@@ -148,7 +149,15 @@ bool Config::get_bg(const Glib::ustring disp, Glib::ustring &file, SetBG::SetMod
 		tcol = color;
 		free(color);
 	}
-	
+
+    flip = g_key_file_get_boolean(kf, disp.c_str(), "flip", &ge);
+
+    if(flip) {
+        g_debug("Retrieved key flip : TRUE");
+    } else {
+        g_debug("FALSE or unknown gboolean");
+    }
+
 	// did not fail
 	// Glib::ustring tcol(color);
 	// free(color);
@@ -170,9 +179,10 @@ bool Config::get_bg(const Glib::ustring disp, Glib::ustring &file, SetBG::SetMod
  * @param	file	The bg file to set
  * @param	mode	The mode the bg is set in
  * @param	bgcolor	The background color, ignored depending on mode
+ * @param   flip    The horizontal flip state
  * @return			Success
  */
-bool Config::set_bg(const Glib::ustring disp, const Glib::ustring file, const SetBG::SetMode mode, const Gdk::Color bgcolor) {
+bool Config::set_bg(const Glib::ustring disp, const Glib::ustring file, const SetBG::SetMode mode, const Gdk::Color bgcolor, bool flip) {
 
 	if ( ! Config::check_dir() )
 		return false;
@@ -226,6 +236,7 @@ bool Config::set_bg(const Glib::ustring disp, const Glib::ustring file, const Se
 	g_key_file_set_string(kf, realdisp.c_str(), "file", file.c_str());
 	g_key_file_set_integer(kf, realdisp.c_str(), "mode", (gint)mode);
 	g_key_file_set_string(kf, realdisp.c_str(), "bgcolor", color_to_string(bgcolor).c_str());
+    g_key_file_set_boolean(kf, realdisp.c_str(), "flip", flip);
 	
 	// output it
 	Glib::ustring outp = g_key_file_to_data(kf, NULL, NULL);
