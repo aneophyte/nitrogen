@@ -54,8 +54,8 @@ NWindow::NWindow(SetBG* bg_setter) : apply (Gtk::Stock::APPLY), btn_prefs(Gtk::S
 	bot_hbox.pack_start (select_mode, FALSE, FALSE, 0);
 	bot_hbox.pack_start (select_display, FALSE, FALSE, 0);
 	bot_hbox.pack_start(button_bgcolor, FALSE, FALSE, 0);
-	
-    bot_hbox.pack_end(chk_btn_flip, FALSE, FALSE, 0);
+    bot_hbox.pack_start(chk_btn_flip, FALSE, FALSE, 0);	
+    
     bot_hbox.pack_end(apply, FALSE, FALSE, 0);
 	bot_hbox.pack_end(btn_prefs, FALSE, FALSE, 0);
 
@@ -172,6 +172,7 @@ void NWindow::sighandle_click_apply (void) {
 	Glib::ustring thedisp = this->select_display.get_active_data(); 
 	Gdk::Color bgcolor = this->button_bgcolor.get_color();
     bool flip = this->chk_btn_flip.get_active();
+    
 	// save	
     Config::get_instance()->set_bg(thedisp, file, mode, bgcolor, flip);
 
